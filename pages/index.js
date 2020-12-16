@@ -12,19 +12,11 @@ export default function Home() {
 
   useEffect(() => {
     fetchData();
+    setInterval(fetchData, 5000);
   }, []);
 
-  const threadData = () => {
-    try {
-      setInterval(() => {
-        fetchData();
-      }, 2000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const fetchData = () => {
+    console.log("test");
     axios
       .get("https://data.covid19.go.id/public/api/update.json")
       .then((response) => {
@@ -34,10 +26,11 @@ export default function Home() {
         for (let i = harian.length - 30; i < harian.length; i++) {
           result.x.push(new Date(harian[i].key_as_string).toLocaleDateString());
           result.y.push(harian[i].jumlah_positif.value);
-          result2.x.push(new Date(harian[i-30].key_as_string).toLocaleDateString());
-          result2.y.push(harian[i-30].jumlah_positif.value);
+          result2.x.push(
+            new Date(harian[i - 30].key_as_string).toLocaleDateString()
+          );
+          result2.y.push(harian[i - 30].jumlah_positif.value);
         }
-        console.log(result);
         setActualData(result);
         setPredictions(result2);
       })
@@ -55,7 +48,7 @@ export default function Home() {
         height: "100vh",
       }}
     >
-      <ChartComponent actualData={actualData} predictions={predictions}/>
+      <ChartComponent actualData={actualData} predictions={predictions} />
     </div>
   );
 }

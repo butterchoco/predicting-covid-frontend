@@ -1,6 +1,38 @@
 import Chart from "react-apexcharts";
+import { useEffect, useState } from "react";
 
 export default function ChartComponent({ actualData, predictions }) {
+  const [actualDataChart, setActualDataChart] = useState({});
+  const [predictionsChart, setPredictionsChart] = useState({});
+
+  useEffect(() => {
+    setActualDataChart(actualData);
+    setPredictionsChart(predictions);
+  }, [actualData, predictions]);
+
+  const series =
+    actualData.y !== undefined && predictions.y !== undefined
+      ? [
+          {
+            name: "Actual Data",
+            data: actualDataChart.y,
+          },
+          {
+            name: "Predictions",
+            data: predictionsChart.y,
+          },
+        ]
+      : [
+          {
+            name: "Actual Data",
+            data: [],
+          },
+          {
+            name: "Predictions",
+            data: [],
+          },
+        ];
+
   return (
     <Chart
       options={{
@@ -35,19 +67,10 @@ export default function ChartComponent({ actualData, predictions }) {
           },
         },
         xaxis: {
-          categories: actualData.x,
+          categories: actualDataChart.x,
         },
       }}
-      series={[
-        {
-          name: "Actual Data",
-          data: actualData.y,
-        },
-        {
-          name: "Predictions",
-          data: predictions.y,
-        },
-      ]}
+      series={series}
       type="area"
       stacked="false"
       height={window.innerHeight / 2}
