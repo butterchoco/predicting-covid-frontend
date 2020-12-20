@@ -1,5 +1,4 @@
 import Chart from "react-apexcharts";
-import { useEffect, useState } from "react";
 
 export default function ChartComponent({ actualData, predictions }) {
   const series = [
