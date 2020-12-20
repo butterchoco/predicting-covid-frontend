@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import dynamic from "next/dynamic";
 
 const ChartComponent = dynamic(() => import("../components/ChartComponent"), {
@@ -7,36 +6,60 @@ const ChartComponent = dynamic(() => import("../components/ChartComponent"), {
 });
 
 export default function Home() {
-  const [actualData, setActualData] = useState({});
-  const [predictions, setPredictions] = useState({});
+  const [actualData, setActualData] = useState([]);
+  const [predictions, setPredictions] = useState([]);
 
   useEffect(() => {
     fetchData();
     setInterval(fetchData, 5000);
   }, []);
 
-  const fetchData = () => {
-    console.log("test");
-    axios
-      .get("https://data.covid19.go.id/public/api/update.json")
-      .then((response) => {
-        const harian = response.data.update.harian;
-        const result = { x: [], y: [] };
-        const result2 = { x: [], y: [] };
-        for (let i = harian.length - 30; i < harian.length; i++) {
-          result.x.push(new Date(harian[i].key_as_string).toLocaleDateString());
-          result.y.push(harian[i].jumlah_positif.value);
-          result2.x.push(
-            new Date(harian[i - 30].key_as_string).toLocaleDateString()
-          );
-          result2.y.push(harian[i - 30].jumlah_positif.value);
-        }
-        setActualData(result);
-        setPredictions(result2);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+  const fetchData = async () => {
+    let covidData;
+    try {
+      const fetchCovid = await fetch(
+        `${process.env.NEXT_PUBLIC_COVID_URL}/update.json`
+      );
+      covidData = (await fetchCovid.json()).update.harian;
+    } catch (e) {
+      covidData = [];
+    }
+
+    covidData.splice(0, covidData.length - 30);
+    const covidCase = covidData.map((data, index) => {
+      return {
+        day: index,
+        positive: data.jumlah_positif.value,
+      };
+    });
+
+    const fetchPredict = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-predicted-result`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          cases: covidCase,
+          days_predict: 30,
+        }),
+      }
+    );
+    const predictData = await fetchPredict.json();
+    saveData(reformatToObject(covidCase), reformatToObject(predictData));
+  };
+
+  const reformatToObject = (data) => {
+    const day = data.map((data) => {
+      return data.day;
+    });
+    const positive = data.map((data) => {
+      return data.positive;
+    });
+    return { day: day, positive: positive };
+  };
+
+  const saveData = (actualData, predictData) => {
+    setActualData(actualData);
+    setPredictions(predictData);
   };
 
   return (
@@ -48,7 +71,9 @@ export default function Home() {
         height: "100vh",
       }}
     >
-      <ChartComponent actualData={actualData} predictions={predictions} />
+      {actualData.length !== 0 && predictions.length !== 0 ? (
+        <ChartComponent actualData={actualData} predictions={predictions} />
+      ) : null}
     </div>
   );
 }
