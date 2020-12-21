@@ -8,6 +8,7 @@ const ChartComponent = dynamic(() => import("../components/ChartComponent"), {
 export default function Home() {
   const [actualData, setActualData] = useState([]);
   const [predictions, setPredictions] = useState([]);
+  const [daysPredict, setDaysPredict] = useState(30);
 
   useEffect(() => {
     fetchData();
@@ -25,10 +26,10 @@ export default function Home() {
       covidData = [];
     }
 
-    covidData.splice(0, covidData.length - 30);
+    covidData.splice(0, covidData.length - daysPredict);
     const covidCase = covidData.map((data, index) => {
       return {
-        day: index,
+        day: index + 1,
         positive: data.jumlah_positif.value,
       };
     });
@@ -39,7 +40,7 @@ export default function Home() {
         method: "POST",
         body: JSON.stringify({
           cases: covidCase,
-          days_predict: 30,
+          days_predict: daysPredict,
         }),
       }
     );
@@ -48,17 +49,17 @@ export default function Home() {
   };
 
   const reformatToObject = (data) => {
-    const day = data.map((data) => {
-      return data.day;
+    const day = data.map((node) => {
+      return node.day;
     });
-    const positive = data.map((data) => {
-      return data.positive;
+    const positive = data.map((node) => {
+      return node.positive;
     });
     return { day: day, positive: positive };
   };
 
-  const saveData = (actualData, predictData) => {
-    setActualData(actualData);
+  const saveData = (covidData, predictData) => {
+    setActualData(covidData);
     setPredictions(predictData);
   };
 
