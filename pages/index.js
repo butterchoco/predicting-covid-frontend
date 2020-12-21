@@ -16,6 +16,14 @@ export default function Home() {
   }, []);
 
   const fetchData = async () => {
+    const responseActualData = fetchActualData();
+    const slicedCovidData = sliceData(responseActualData, daysPredict);
+    const covidCase = reformatResponseToBackendFormat(slicedCovidData)
+    const predictData = sendDataToBackend(covidCase, daysPredict)
+    saveData(reformatToObject(covidCase), reformatToObject(predictData));
+  };
+
+  const fetchActualData = () => {
     let covidData;
     try {
       const fetchCovid = await fetch(
@@ -25,28 +33,43 @@ export default function Home() {
     } catch (e) {
       covidData = [];
     }
+    return covidData;
+  }
 
-    covidData.splice(0, covidData.length - daysPredict);
-    const covidCase = covidData.map((data, index) => {
+  const sendDataToBackend = (covidData, daysToPredict) => {
+    let predictData;
+    try {
+      const fetchPredict = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-predicted-result`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            cases: covidData,
+            days_predict: daysToPredict,
+          }),
+        }
+      );
+      predictData = await fetchPredict.json();
+    } catch (e) {
+      predictData = [];
+    }
+    return predictData
+  }
+
+  const sliceData = (arr, dataRemain) => {
+    const clone = [...arr];
+    clone.splice(0, covidData.length - dataRemain);
+    return clone;
+  };
+
+  const reformatResponseToBackendFormat = (rawData) => {
+    return rawData.map((data, index) => {
       return {
         day: index + 1,
         positive: data.jumlah_positif.value,
       };
     });
-
-    const fetchPredict = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-predicted-result`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          cases: covidCase,
-          days_predict: daysPredict,
-        }),
-      }
-    );
-    const predictData = await fetchPredict.json();
-    saveData(reformatToObject(covidCase), reformatToObject(predictData));
-  };
+  }
 
   const reformatToObject = (data) => {
     const day = data.map((node) => {
