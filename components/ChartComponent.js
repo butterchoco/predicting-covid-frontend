@@ -46,14 +46,14 @@ export default function ChartComponent({ actualData, predictions }) {
           },
         },
         xaxis: {
-          categories: actualData.day,
+          categories: predictions.day,
         },
       }}
       series={series}
       type="area"
       stacked="false"
       height={window.innerHeight / 2}
-      width={window.innerWidth / 2}
+      width={window.innerWidth / 1.15}
     />
   );
 }

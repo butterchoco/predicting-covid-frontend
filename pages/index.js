@@ -16,14 +16,14 @@ export default function Home() {
   }, []);
 
   const fetchData = async () => {
-    const responseActualData = fetchActualData();
+    const responseActualData = await fetchActualData();
     const slicedCovidData = sliceData(responseActualData, daysPredict);
-    const covidCase = reformatResponseToBackendFormat(slicedCovidData)
-    const predictData = sendDataToBackend(covidCase, daysPredict)
+    const covidCase = reformatResponseToBackendFormat(slicedCovidData);
+    const predictData = await sendDataToBackend(covidCase, daysPredict);
     saveData(reformatToObject(covidCase), reformatToObject(predictData));
   };
 
-  const fetchActualData = () => {
+  const fetchActualData = async () => {
     let covidData;
     try {
       const fetchCovid = await fetch(
@@ -34,9 +34,9 @@ export default function Home() {
       covidData = [];
     }
     return covidData;
-  }
+  };
 
-  const sendDataToBackend = (covidData, daysToPredict) => {
+  const sendDataToBackend = async (covidData, daysToPredict) => {
     let predictData;
     try {
       const fetchPredict = await fetch(
@@ -53,12 +53,12 @@ export default function Home() {
     } catch (e) {
       predictData = [];
     }
-    return predictData
-  }
+    return predictData;
+  };
 
   const sliceData = (arr, dataRemain) => {
     const clone = [...arr];
-    clone.splice(0, covidData.length - dataRemain);
+    clone.splice(0, arr.length - dataRemain);
     return clone;
   };
 
@@ -69,15 +69,11 @@ export default function Home() {
         positive: data.jumlah_positif.value,
       };
     });
-  }
+  };
 
   const reformatToObject = (data) => {
-    const day = data.map((node) => {
-      return node.day;
-    });
-    const positive = data.map((node) => {
-      return node.positive;
-    });
+    const day = data.map((node) => node.day);
+    const positive = data.map((node) => node.positive);
     return { day: day, positive: positive };
   };
 
