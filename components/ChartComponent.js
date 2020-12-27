@@ -47,6 +47,14 @@ export default function ChartComponent({ actualData, predictions }) {
         },
         xaxis: {
           categories: predictions.day,
+          title: {
+            text: "Tanggal",
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Jumlah Kasus per Hari",
+          },
         },
       }}
       series={series}

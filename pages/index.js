@@ -27,9 +27,12 @@ export default function Home() {
     let covidData;
     try {
       const fetchCovid = await fetch(
-        `${process.env.NEXT_PUBLIC_COVID_URL}/api/harian`
+        `https://cors-anywhere.herokuapp.com/${process.env.NEXT_PUBLIC_COVID_URL}/public/api/update.json`,
+        {
+          origin: process.env.NEXT_PUBLIC_FRONTEND_URL,
+        }
       );
-      covidData = (await fetchCovid.json()).data;
+      covidData = (await fetchCovid.json()).update.harian;
     } catch (e) {
       covidData = [];
     }
@@ -64,20 +67,19 @@ export default function Home() {
 
   const reformatResponseToBackendFormat = (rawData) => {
     return rawData.map((data, index) => {
-      return data.jumlahKasusKumulatif !== null
-        ? {
-            day: index + 1,
-            positive: data.jumlahKasusKumulatif,
-          }
-        : {
-            day: index + 1,
-            positive: rawData[index - 1].jumlahKasusKumulatif,
-          };
+      return {
+        day: index,
+        positive: data.jumlah_positif.value,
+      };
     });
   };
 
   const reformatToObject = (data) => {
-    const day = data.map((node) => node.day);
+    const day = data.map((node) => {
+      const today = new Date();
+      today.setDate(new Date().getDate() + node.day);
+      return today.toISOString().split("T")[0];
+    });
     const positive = data.map((node) => node.positive);
     return { day: day, positive: positive };
   };
