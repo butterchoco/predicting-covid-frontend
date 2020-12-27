@@ -27,9 +27,9 @@ export default function Home() {
     let covidData;
     try {
       const fetchCovid = await fetch(
-        `${process.env.NEXT_PUBLIC_COVID_URL}/update.json`
+        `${process.env.NEXT_PUBLIC_COVID_URL}/api/harian`
       );
-      covidData = (await fetchCovid.json()).update.harian;
+      covidData = (await fetchCovid.json()).data;
     } catch (e) {
       covidData = [];
     }
@@ -45,7 +45,7 @@ export default function Home() {
           method: "POST",
           body: JSON.stringify({
             cases: covidData,
-            days_predict: daysToPredict,
+            days_predict: daysToPredict * 2,
           }),
         }
       );
@@ -64,10 +64,15 @@ export default function Home() {
 
   const reformatResponseToBackendFormat = (rawData) => {
     return rawData.map((data, index) => {
-      return {
-        day: index + 1,
-        positive: data.jumlah_positif.value,
-      };
+      return data.jumlahKasusKumulatif !== null
+        ? {
+            day: index + 1,
+            positive: data.jumlahKasusKumulatif,
+          }
+        : {
+            day: index + 1,
+            positive: rawData[index - 1].jumlahKasusKumulatif,
+          };
     });
   };
 
