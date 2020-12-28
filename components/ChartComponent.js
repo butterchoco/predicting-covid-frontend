@@ -61,7 +61,7 @@ export default function ChartComponent({ actualData, predictions }) {
       type="area"
       stacked="false"
       height={window.innerHeight / 2}
-      width={window.innerWidth / 1.15}
+      width={window.innerWidth / 1.05}
     />
   );
 }
