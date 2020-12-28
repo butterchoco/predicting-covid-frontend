@@ -32,39 +32,33 @@ export default function Home() {
   };
 
   const fetchActualData = async () => {
-    let covidData;
-    try {
-      const fetchCovid = await fetch(
-        `https://cors-anywhere.herokuapp.com/${process.env.NEXT_PUBLIC_COVID_URL}/public/api/update.json`,
-        {
-          origin: process.env.NEXT_PUBLIC_FRONTEND_URL,
-        }
-      );
-      covidData = (await fetchCovid.json()).update.harian;
-    } catch (e) {
-      covidData = [];
-    }
-    return covidData;
+    return await fetch(
+      `https://cors-anywhere.herokuapp.com/${process.env.NEXT_PUBLIC_COVID_URL}/public/api/update.json`,
+      {
+        origin: process.env.NEXT_PUBLIC_FRONTEND_URL,
+      }
+    )
+      .then(async (data) => (await data.json()).update.harian)
+      .catch(() => []);
+  };
+
+  const optionPostFetch = (cases, days_predict) => {
+    return {
+      method: "POST",
+      body: JSON.stringify({
+        cases,
+        days_predict,
+      }),
+    };
   };
 
   const sendDataToBackend = async (covidData, daysToPredict) => {
-    let predictData;
-    try {
-      const fetchPredict = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-predicted-result`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            cases: covidData,
-            days_predict: daysToPredict * 2,
-          }),
-        }
-      );
-      predictData = await fetchPredict.json();
-    } catch (e) {
-      predictData = [];
-    }
-    return predictData;
+    return await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-predicted-result`,
+      optionPostFetch(covidData, daysToPredict * 2)
+    )
+      .then(async (data) => await data.json())
+      .catch(() => []);
   };
 
   const sliceData = (arr, dataRemain) => {
