@@ -9,10 +9,15 @@ export default function Home() {
   const [actualData, setActualData] = useState([]);
   const [predictions, setPredictions] = useState([]);
   const [daysPredict, setDaysPredict] = useState(30);
+  const optionsDate = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
 
   useEffect(() => {
     fetchData();
-    setInterval(fetchData, 5000);
+    setInterval(fetchData, 10000);
   }, []);
 
   const fetchData = async () => {
@@ -20,7 +25,10 @@ export default function Home() {
     const slicedCovidData = sliceData(responseActualData, daysPredict);
     const covidCase = reformatResponseToBackendFormat(slicedCovidData);
     const predictData = await sendDataToBackend(covidCase, daysPredict);
-    saveData(reformatToObject(covidCase), reformatToObject(predictData));
+    saveData(
+      reformatListToObject(covidCase),
+      reformatListToObject(predictData)
+    );
   };
 
   const fetchActualData = async () => {
@@ -74,14 +82,25 @@ export default function Home() {
     });
   };
 
-  const reformatToObject = (data) => {
-    const day = data.map((node) => {
-      const today = new Date();
-      today.setDate(new Date().getDate() + node.day);
-      return today.toISOString().split("T")[0];
-    });
-    const positive = data.map((node) => node.positive);
-    return { day: day, positive: positive };
+  const reformatListToObject = (arr) => {
+    return {
+      day: reformatDayList(changeDayIndexToDateFormat, arr),
+      positive: reformatPositiveList(arr),
+    };
+  };
+
+  const reformatDayList = (fun, arr) => {
+    return arr.map(fun);
+  };
+
+  const reformatPositiveList = (arr) => {
+    return arr.map((node) => node.positive);
+  };
+
+  const changeDayIndexToDateFormat = (data) => {
+    const today = new Date();
+    today.setDate(new Date().getDate() + data.day);
+    return today.toLocaleString("id-ID", optionsDate).split(",")[0];
   };
 
   const saveData = (covidData, predictData) => {
