@@ -1,0 +1,39 @@
+image: node:10.15.3
+
+stages:
+  - install_dependencies
+  - build
+  - deploy
+
+install_dependencies:
+  stage: install_dependencies
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules
+    expire_in: 5 hours
+  only:
+    - master
+
+build:
+  stage: build
+  script:
+    - npm run build
+    - npm run export
+  artifacts:
+    paths:
+      - out
+    expire_in: 5 hours
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  script:
+    - npm i -g surge
+    - surge --project ./out --domain covid-prediction-funpro.surge.sh
+  dependencies:
+    - build
+  only:
+    - master
