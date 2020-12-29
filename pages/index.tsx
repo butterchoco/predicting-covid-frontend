@@ -105,15 +105,15 @@ export default function Home() {
   };
 
   const filterMoreThanDaysPredict = (value: any, index: number, arr: any[]) => {
-    return index > arr.length - daysPredict
+    return index >= arr.length - daysPredict
   }
 
   const dropNullCases = (data: any, index: number, arr: any[]) => {
       return !isNullCase(data.jumlahKasusBaruperHari) ? {
-        day: index,
+        day: index+1,
         positive: data.jumlahKasusBaruperHari,
       }: {
-        day: index,
+        day: index+1,
         positive: arr[index-1].jumlahKasusBaruperHari,
       };
     }
