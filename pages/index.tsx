@@ -4,6 +4,7 @@ import Placeholder from "../components/Placeholder";
 import InformationPlaceholder from "../components/InformationPlaceholder";
 import Css from "../styles/common.module.css";
 import DayPredictionInput from "../components/DayPredictionInput";
+import { isNull } from "util";
 
 const ChartComponent = dynamic(() => import("../components/ChartComponent"), {
   ssr: false,
@@ -24,8 +25,8 @@ const optionsDate = {
 };
 
 export default function Home() {
-  const [actualData, setActualData] = useState({});
-  const [predictions, setPredictions] = useState({});
+  const [actualData, setActualData] = useState({day: null, positive: null});
+  const [predictions, setPredictions] = useState({day: null, positive: null});
   const [daysPredict, setDaysPredict] = useState(30);
   const [daysPredictInput, setDaysPredictInput] = useState(30);
   const [loadingState, setLoadingState] = useState("Starting...");
@@ -154,7 +155,7 @@ export default function Home() {
 
   return (
     <div style={Container}>
-      {actualData.hasOwnProperty("day") ? (
+      {!isNullCase(actualData.positive) ? (
         <div className={Css.gridContainer}>
           <InformationPlaceholder title="Terkonfirmasi" description={confirmedCase} style={{padding: "1rem", color: "white", background: "#fdb827", gridArea: "confirmed"}}/>
           <InformationPlaceholder title="Kasus Aktif" description={activeCase} style={{padding: "1rem", color: "white", background: "#c70039", gridArea: "active"}}/>
