@@ -1,6 +1,6 @@
 import Chart from "react-apexcharts";
 
-export default function ChartComponent({ actualData, predictions }) {
+export default function ChartComponent({ style, actualData, predictions }) {
   const series = [
     {
       name: "Actual Data",
@@ -14,6 +14,7 @@ export default function ChartComponent({ actualData, predictions }) {
 
   return (
     <Chart
+      style={style}
       options={{
         chart: {
           zoom: {
@@ -61,7 +62,7 @@ export default function ChartComponent({ actualData, predictions }) {
       type="area"
       stacked="false"
       height={window.innerHeight / 2}
-      width={window.innerWidth / 1.05}
+      width={window.innerWidth / 1.5}
     />
   );
 }
