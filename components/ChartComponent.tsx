@@ -12,7 +12,7 @@ export default function ChartComponent({ actualData, predictions }) {
     },
   ];
 
-  return (
+  return <div style={{gridArea: "prediction"}}>
     <Chart
       options={{
         chart: {
@@ -59,9 +59,8 @@ export default function ChartComponent({ actualData, predictions }) {
       }}
       series={series}
       type="area"
-      stacked="false"
       height={window.innerHeight / 2}
-      width={window.innerWidth / 1.05}
+      width={window.innerWidth / 1.5}
     />
-  );
+  </div>;
 }
