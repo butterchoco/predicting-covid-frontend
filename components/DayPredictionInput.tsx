@@ -8,13 +8,19 @@ export default function DayPredictionInput({daysPredictInput, setDaysPredict, se
             label="Hari yang ingin diprediksi"
             id="standard-size-small"
             onKeyUp={(e: any) => {
-                if (e.keyCode === 13) setDaysPredict(daysPredictInput);
+                if (e.keyCode === 13 && daysPredictInput <= 60) {
+                    setDaysPredict(daysPredictInput);
+                }
                 else setDaysPredictInput(e.target.value)
             }}
             size="small"
-            type="number"/>
+            type="number"
+            error={daysPredictInput > 60}
+            helperText="Maksimal 60 hari prediksi"/>
         <Button
-            onClick={() => setDaysPredict(daysPredictInput)}
+            onClick={() => {
+                if (daysPredictInput <= 60) setDaysPredict(daysPredictInput)
+            }}
             variant="contained"
             color="primary"
             disableElevation={true}>Prediksi!</Button>
