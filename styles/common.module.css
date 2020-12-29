@@ -1,0 +1,17 @@
+.verticalContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridContainer {
+  display: grid;
+  gap: 1rem;
+  grid-template-areas:
+    "dayspredict       dayspredict    dayspredict"
+    "confirmed         prediction     recovered"
+    "confirmed         prediction     recovered"
+    "active            prediction     death"
+    "active            prediction     death";
+}
