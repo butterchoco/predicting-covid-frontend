@@ -47,8 +47,7 @@ export default function Home() {
     const responseActualData = await fetchActualData();
     setCasesNumber(responseActualData, responseActualData.length-1);
     setLoadingState("Shaping Data");
-    const slicedCovidData = sliceData(responseActualData, daysPredict);
-    const covidCase = reformatResponseToBackendFormat(slicedCovidData);
+    const covidCase = reformatResponseToBackendFormat(responseActualData, daysPredict);
     setLoadingState("Predicting Data");
     const predictData = await sendDataToBackend(covidCase, daysPredict);
     setLoadingState("Finishing");
@@ -99,23 +98,29 @@ export default function Home() {
       .catch(() => []);
   };
 
-  const sliceData = (arr: any[], dataRemain: number) => {
-    const clone = [...arr];
-    clone.splice(0, arr.length - dataRemain);
-    return clone;
+  const reformatResponseToBackendFormat = (rawData: any[], dataRemain: number) => {
+    return rawData
+      .filter(filterMoreThanDaysPredict)
+      .map(dropNullCases);
   };
 
-  const reformatResponseToBackendFormat = (rawData: any[]) => {
-    return rawData.map((data: any, index: number) => {
-      return data.jumlahKasusBaruperHari !== null ? {
+  const filterMoreThanDaysPredict = (value: any, index: number, arr: any[]) => {
+    return index > arr.length - daysPredict
+  }
+
+  const dropNullCases = (data: any, index: number, arr: any[]) => {
+      return !isNullCase(data.jumlahKasusBaruperHari) ? {
         day: index,
         positive: data.jumlahKasusBaruperHari,
       }: {
         day: index,
-        positive: rawData[index-1].jumlahKasusBaruperHari,
+        positive: arr[index-1].jumlahKasusBaruperHari,
       };
-    });
-  };
+    }
+
+  const isNullCase = (data) => {
+    return data === null
+  }
 
   const reformatListToObject = (arr: any[]) => {
     return {
