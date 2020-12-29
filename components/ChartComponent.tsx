@@ -3,12 +3,12 @@ import Chart from "react-apexcharts";
 export default function ChartComponent({ actualData, predictions }) {
   const series = [
     {
-      name: "Actual Data",
-      data: actualData.positive,
-    },
-    {
       name: "Predictions",
       data: predictions.positive,
+    },
+    {
+      name: "Actual Data",
+      data: actualData.positive,
     },
   ];
 
