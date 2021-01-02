@@ -144,7 +144,7 @@ export default function Home() {
 
   const getFutureDate = (day: number) => {
     const today = new Date();
-    today.setDate(new Date().getDate() + day);
+    today.setDate(new Date().getDate() - daysPredict + day);
     return today.toLocaleString("id-ID", optionsDate).split(",")[0];
   };
 
